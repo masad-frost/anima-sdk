@@ -1,0 +1,40 @@
+{
+  "name": "@animaapp/anima-sdk-react",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Anima's JavaScript utilities library",
+  "author": "Anima App, Inc.",
+  "license": "ISC",
+  "packageManager": "yarn@4.6.0",
+  "exports": {
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
+  "types": "./dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AnimaApp/anima-sdk"
+  },
+  "scripts": {
+    "build": "vite build",
+    "tests": "vitest run --dir ./tests",
+    "prepack": "yarn build"
+  },
+  "dependencies": {
+    "eventsource": "^3.0.5",
+    "immer": "^10.1.1",
+    "swr": "^2.3.2",
+    "use-immer": "^0.11.0"
+  },
+  "peerDependencies": {
+    "@animaapp/anima-sdk": "workspace:*",
+    "react": "^17.x.x || ^18.x.x || ^19.x.x"
+  },
+  "devDependencies": {
+    "@animaapp/anima-sdk": "workspace:*",
+    "vite": "^6.0.11",
+    "vite-plugin-dts": "^4.5.0",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^3.0.5"
+  }
+}
