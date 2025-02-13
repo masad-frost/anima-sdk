@@ -79,6 +79,7 @@ export class Anima {
         nodesId: params.nodesId,
         assetsStorage: params.assetsStorage,
         language: settings.language,
+        model: settings.model,
         framework: settings.framework,
         styling: settings.styling,
         uiLibrary: settings.uiLibrary,
