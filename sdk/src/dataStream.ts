@@ -86,13 +86,14 @@ export const createCodegenResponseEventStream = async (
     });
   }
 
+  const encoder = new TextEncoder();
   const seeStream = consumerStream.pipeThrough(
     new TransformStream({
       transform(chunk, controller) {
         const sseString = `event: ${chunk.type}\ndata: ${JSON.stringify(
           chunk
         )}\n\n`;
-        controller.enqueue(sseString);
+        controller.enqueue(encoder.encode(sseString));
       },
     })
   );
