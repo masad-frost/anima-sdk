@@ -42,7 +42,7 @@ const { files } = await anima.generateCode({
 });
 ```
 
-With the `"local"` strategy, Anima will host the assets files. This is the default strategy.
+With the `"host"` strategy, Anima will host the assets files. This is the default strategy.
 
 ### Manage your own hosting
 
@@ -52,7 +52,7 @@ const { files, assets } = await anima.generateCode({
 });
 ```
 
-With the `"external"` strategy, the method returns assets, an array of `{ name, url }`. Download each asset from its url and re-upload it at your own hosting.
+With the `"external"` strategy, the method returns assets in an array of `{ name, url }`. Download each asset from its url and re-upload it at your own hosting.
 
 ### Local
 
