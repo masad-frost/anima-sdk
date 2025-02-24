@@ -30,7 +30,7 @@ export type AssetsStorage =
 
 export type GetCodeParams = {
   fileKey: string;
-  figmaToken: string;
+  figmaToken?: string;
   nodesId: string[];
   assetsStorage?: AssetsStorage;
   settings: CodegenSettings;
