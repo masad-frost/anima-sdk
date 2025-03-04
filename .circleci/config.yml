@@ -2,12 +2,9 @@ version: 2.1
 setup: true
 
 workflows:
-  checks-workflow:
+  main-workflow:
     jobs:
       - lint
-
-  publish-workflow:
-    jobs:
       - publish:
           context: anima-prod
           filters:
