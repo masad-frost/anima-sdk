@@ -164,6 +164,7 @@ export const useAnimaCodegen = ({
 
         updateStatus((draft) => {
           draft.tasks.codeGeneration.progress = message.payload.progress;
+          draft.tasks.codeGeneration.status = "running";
         });
       });
 
@@ -220,9 +221,7 @@ export const useAnimaCodegen = ({
       });
 
       es.addEventListener("done", (event) => {
-        const message = JSON.parse(
-          event.data
-        ) as StreamMessageByType<"done">;
+        const message = JSON.parse(event.data) as StreamMessageByType<"done">;
         result.tokenUsage = message.payload.tokenUsage;
 
         updateStatus((draft) => {
