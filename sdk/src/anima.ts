@@ -145,6 +145,12 @@ export class Anima {
             }
 
             switch (data.type) {
+              case "queueing": {
+                typeof handler === "function"
+                  ? handler(data)
+                  : handler.onQueueing?.();
+                break;
+              }
               case "start": {
                 result.sessionId = data.sessionId;
                 typeof handler === "function"
