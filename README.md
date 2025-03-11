@@ -8,7 +8,10 @@
 import { Anima } from "@animaapp/anima-sdk";
 
 const anima = new Anima({
-  auth: { token: "Your Anima Token" },
+    auth: {
+        token: "Your Anima Token",
+        userId: 'x', // Optional, only used if you want to link the request to an external id
+    },
 });
 
 const { files } = await anima.generateCode({
@@ -20,6 +23,9 @@ const { files } = await anima.generateCode({
     model: "gpt-4o-mini",
     framework: "react",
     styling: "css",
+  },
+  tracking: {
+    externalId: "x", // Optional, used to override the userId from auth, if provided
   },
 });
 

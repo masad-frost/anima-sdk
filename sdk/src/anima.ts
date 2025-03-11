@@ -49,10 +49,6 @@ export class Anima {
       if ("teamId" in this.#auth) {
         headers["X-Team-Id"] = this.#auth.teamId;
       }
-
-      if ("userId" in this.#auth && this.#auth.userId) {
-        headers["X-User-Id"] = this.#auth.userId;
-      }
     }
 
     return headers;
@@ -65,6 +61,13 @@ export class Anima {
 
     const result: Partial<AnimaSDKResult> = {};
     const settings = validateSettings(params.settings);
+
+    let tracking = params.tracking;
+    if (this.#auth && "userId" in this.#auth && this.#auth.userId) {
+      if (!tracking?.externalId) {
+        tracking = { externalId: this.#auth.userId };
+      }
+    }
 
     const response = await fetch(`${this.#apiBaseAddress}/v1/codegen`, {
       method: "POST",
