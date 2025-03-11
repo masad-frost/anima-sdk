@@ -39,7 +39,7 @@ export type GetCodeParams = {
   nodesId: string[];
   assetsStorage?: AssetsStorage;
   settings: CodegenSettings;
-  tracking: TrackingInfos;
+  tracking?: TrackingInfos;
 };
 
 export type GetCodeHandler =
