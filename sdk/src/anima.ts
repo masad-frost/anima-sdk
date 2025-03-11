@@ -76,7 +76,7 @@ export class Anima {
         Accept: "text/event-stream",
       },
       body: JSON.stringify({
-        tracking: params.tracking,
+        tracking,
         fileKey: params.fileKey,
         figmaToken: params.figmaToken,
         nodesId: params.nodesId,
