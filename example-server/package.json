@@ -1,6 +1,7 @@
 {
   "name": "example-server",
   "type": "module",
+  "private": true,
   "scripts": {
     "dev": "tsx watch src/index.ts"
   },
