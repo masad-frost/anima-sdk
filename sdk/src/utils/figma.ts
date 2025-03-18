@@ -29,12 +29,18 @@ export const isValidFigmaUrl = (
 export const formatToFigmaLink = ({
   fileKey,
   nodeId,
+  duplicate,
 }: {
   fileKey: string;
   nodeId: string;
+  duplicate?: boolean;
 }) => {
   const url = new URL("https://www.figma.com");
   url.pathname = `design/${fileKey}`;
+
+  if (duplicate) {
+    url.pathname = `${url.pathname}/duplicate`;
+  }
 
   if (nodeId) {
     url.searchParams.set("node-id", nodeId.replace(":", "-"));
