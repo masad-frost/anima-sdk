@@ -178,7 +178,7 @@ export const NotFoundFile: Story = {
   },
 };
 
-export const InvalidSelectedNode: Story = {
+export const NotSupportedNode: Story = {
   play: async (context) => {
     const { error } = await run(context);
 
@@ -192,6 +192,27 @@ export const InvalidSelectedNode: Story = {
     payload: {
       fileKey: "5d0u9PmD4GtB5fdX57pTtK",
       nodesId: ["14:5"],
+      settings: {
+        framework: "react",
+        styling: "plain_css",
+      },
+    },
+  },
+};
+
+export const InvisibleGroupNode: Story = {
+  play: async (context) => {
+    const { error } = await run(context);
+
+    expect(error).toMatchObject({
+      name: "Task Crashed",
+      message: "Invisible group nodes are unsupported",
+    });
+  },
+  args: {
+    payload: {
+      fileKey: "5d0u9PmD4GtB5fdX57pTtK",
+      nodesId: ["134:14"],
       settings: {
         framework: "react",
         styling: "plain_css",

@@ -1,9 +1,9 @@
-// TODO: `CodegenErrorReason` should be imported from `anima-public-api`
 /**
  * Errors from Public API
  */
 export type CodegenErrorReason =
   | "Selected node type is not supported"
+  | "Invisible group nodes are unsupported"
   | "Selected node is a page with multiple children"
   | "There is no node with the given id"
   | "Invalid Figma token"
