@@ -2,6 +2,7 @@ import { arrayBufferToBase64 } from "./utils";
 import type {
   AnimaSDKResult,
   GetCodeParams,
+  GetLink2CodeParams,
   StreamCodgenMessage,
 } from "@animaapp/anima-sdk";
 import { CodegenError } from "@animaapp/anima-sdk";
@@ -12,9 +13,13 @@ type LocalAssetsStorage =
   | { strategy: "local"; path: string }
   | { strategy: "local"; filePath: string; referencePath: string };
 
-export type UseAnimaParams = Omit<GetCodeParams, "assetsStorage"> & {
-  assetsStorage?: GetCodeParams["assetsStorage"] | LocalAssetsStorage;
-};
+export type UseAnimaParams =
+  | (Omit<GetCodeParams, "assetsStorage"> & {
+      assetsStorage?: GetCodeParams["assetsStorage"] | LocalAssetsStorage;
+    })
+  | (Omit<GetLink2CodeParams, "assetsStorage"> & {
+      assetsStorage?: GetLink2CodeParams["assetsStorage"] | LocalAssetsStorage;
+    });
 
 type Status = "idle" | "pending" | "success" | "aborted" | "error";
 
@@ -187,6 +192,12 @@ export const useAnimaCodegen = ({
         });
       });
 
+      es.addEventListener("generation_completed", () => {
+        updateStatus((draft) => {
+          draft.tasks.codeGeneration.status = "finished";
+        });
+      });
+
       es.addEventListener("assets_uploaded", () => {
         updateStatus((draft) => {
           draft.tasks.uploadAssets.status = "finished";
@@ -212,7 +223,7 @@ export const useAnimaCodegen = ({
             const response = await lastFetchResponse;
             errorPayload = await response.json();
           }
-        } catch {}
+        } catch { }
 
         const codegenError = new CodegenError({
           name: errorPayload?.payload.name ?? "Unknown error",

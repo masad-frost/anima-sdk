@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { GetFileResponse } from "@figma/rest-api-spec";
 import { CodegenError, CodegenRouteErrorReason } from "./errors";
 import { getFigmaFile } from "./figma";
@@ -6,7 +7,10 @@ import {
   AnimaSDKResult,
   GetCodeHandler,
   GetCodeParams,
+  GetLink2CodeHandler,
+  GetLink2CodeParams,
   SSECodgenMessage,
+  SSEL2CMessage,
 } from "./types";
 import { isNodeCodegenCompatible } from "./utils/isNodeCodegenCompatible";
 
@@ -92,53 +96,34 @@ export class Anima {
     }
   }
 
-  async generateCode(params: GetCodeParams, handler: GetCodeHandler = {}) {
+  /**
+   * Generic method to handle API requests and stream processing for both code generation and link2code.
+   * 
+   * @param endpoint - The API endpoint to call
+   * @param requestBody - The request body to send
+   * @param handler - The handler for processing messages
+   * @param messageType - The type of messages being processed (for TypeScript type safety)
+   * @returns The result of the generation process
+   */
+  async #processGenerationRequest<T extends SSECodgenMessage | SSEL2CMessage>(
+    endpoint: string,
+    requestBody: any,
+    handler: ((message: T) => void) | Record<string, any>,
+    messageType: 'codegen' | 'l2c'
+  ): Promise<AnimaSDKResult> {
     if (this.hasAuth() === false) {
       throw new Error('It needs to set "auth" before calling this method.');
     }
 
-    if (params.figmaToken) {
-      await this.#checkGivenNodeIsValid(
-        params.fileKey,
-        params.figmaToken,
-        params.nodesId
-      );
-    }
-
     const result: Partial<AnimaSDKResult> = {};
-    const settings = validateSettings(params.settings);
 
-    let tracking = params.tracking;
-    if (this.#auth && "userId" in this.#auth && this.#auth.userId) {
-      if (!tracking?.externalId) {
-        tracking = { externalId: this.#auth.userId };
-      }
-    }
-
-    const response = await fetch(`${this.#apiBaseAddress}/v1/codegen`, {
+    const response = await fetch(`${this.#apiBaseAddress}${endpoint}`, {
       method: "POST",
       headers: {
         ...this.headers,
         Accept: "text/event-stream",
       },
-      body: JSON.stringify({
-        tracking,
-        fileKey: params.fileKey,
-        figmaToken: params.figmaToken,
-        nodesId: params.nodesId,
-        assetsStorage: params.assetsStorage,
-        language: settings.language,
-        model: settings.model,
-        framework: settings.framework,
-        styling: settings.styling,
-        uiLibrary: settings.uiLibrary,
-        enableTranslation: settings.enableTranslation,
-        enableUILibraryTheming: settings.enableUILibraryTheming,
-        enableCompactStructure: settings.enableCompactStructure,
-        enableAutoSplit: settings.enableAutoSplit,
-        autoSplitThreshold: settings.autoSplitThreshold,
-        disableMarkedForExport: settings.disableMarkedForExport,
-      }),
+      body: JSON.stringify(requestBody),
     });
 
     if (!response.ok) {
@@ -147,7 +132,7 @@ export class Anima {
       let errorObj = undefined;
       try {
         errorObj = JSON.parse(errorText);
-      } catch {}
+      } catch { }
 
       if (errorObj?.error?.name === "ZodError") {
         throw new CodegenError({
@@ -203,7 +188,7 @@ export class Anima {
           if (!line.trim() || line.startsWith(":")) continue;
 
           if (line.startsWith("data: ")) {
-            let data: SSECodgenMessage;
+            let data: T;
             try {
               data = JSON.parse(line.slice(6));
             } catch {
@@ -219,17 +204,19 @@ export class Anima {
                 break;
               }
               case "start": {
-                result.sessionId = data.sessionId;
+                result.sessionId = (data as any).sessionId;
                 typeof handler === "function"
                   ? handler(data)
-                  : handler.onStart?.({ sessionId: data.sessionId });
+                  : handler.onStart?.({ sessionId: (data as any).sessionId });
                 break;
               }
 
               case "pre_codegen": {
-                typeof handler === "function"
-                  ? handler(data)
-                  : handler.onPreCodegen?.({ message: data.message });
+                if (messageType === 'codegen') {
+                  typeof handler === "function"
+                    ? handler(data)
+                    : handler.onPreCodegen?.({ message: (data as any).message });
+                }
                 break;
               }
 
@@ -241,43 +228,46 @@ export class Anima {
               }
 
               case "assets_list": {
-                result.assets = data.payload.assets;
+                result.assets = (data as any).payload.assets;
 
                 typeof handler === "function"
                   ? handler(data)
-                  : handler.onAssetsList?.(data.payload);
+                  : handler.onAssetsList?.((data as any).payload);
                 break;
               }
 
               case "figma_metadata": {
-                result.figmaFileName = data.figmaFileName;
-                result.figmaSelectedFrameName = data.figmaSelectedFrameName;
+                if (messageType === 'codegen') {
+                  result.figmaFileName = (data as any).figmaFileName;
+                  result.figmaSelectedFrameName = (data as any).figmaSelectedFrameName;
 
-                typeof handler === "function"
-                  ? handler(data)
-                  : handler.onFigmaMetadata?.({
-                      figmaFileName: data.figmaFileName,
-                      figmaSelectedFrameName: data.figmaSelectedFrameName,
+                  typeof handler === "function"
+                    ? handler(data)
+                    : handler.onFigmaMetadata?.({
+                      figmaFileName: (data as any).figmaFileName,
+                      figmaSelectedFrameName: (data as any).figmaSelectedFrameName,
                     });
+                }
                 break;
               }
 
               case "generating_code": {
-                if (data.payload.status === "success") {
-                  result.files = data.payload.files;
+                if ((data as any).payload.status === "success") {
+                  result.files = (data as any).payload.files;
                 }
 
                 typeof handler === "function"
                   ? handler(data)
                   : handler.onGeneratingCode?.({
-                      status: data.payload.status,
-                      progress: data.payload.progress,
-                      files: data.payload.files,
-                    });
+                    status: (data as any).payload.status,
+                    progress: (data as any).payload.progress,
+                    files: (data as any).payload.files,
+                  });
                 break;
               }
 
-              case "codegen_completed": {
+              case "codegen_completed":
+              case "generation_completed": {
                 typeof handler === "function"
                   ? handler(data)
                   : handler.onCodegenCompleted?.();
@@ -286,8 +276,8 @@ export class Anima {
 
               case "error": {
                 throw new CodegenError({
-                  name: data.payload.errorName,
-                  reason: data.payload.reason,
+                  name: (data as any).payload.errorName,
+                  reason: (data as any).payload.reason,
                 });
               }
 
@@ -299,7 +289,7 @@ export class Anima {
                   });
                 }
 
-                result.tokenUsage = data.payload.tokenUsage;
+                result.tokenUsage = (data as any).payload.tokenUsage;
                 return result as AnimaSDKResult;
               }
             }
@@ -315,5 +305,77 @@ export class Anima {
       reason: "Connection closed before the 'done' message",
       status: 500,
     });
+  }
+
+  async generateCode(params: GetCodeParams, handler: GetCodeHandler = {}) {
+    if (params.figmaToken) {
+      await this.#checkGivenNodeIsValid(
+        params.fileKey,
+        params.figmaToken,
+        params.nodesId
+      );
+    }
+
+    const settings = validateSettings(params.settings);
+
+    let tracking = params.tracking;
+    if (this.#auth && "userId" in this.#auth && this.#auth.userId) {
+      if (!tracking?.externalId) {
+        tracking = { externalId: this.#auth.userId };
+      }
+    }
+
+    const requestBody = {
+      tracking,
+      fileKey: params.fileKey,
+      figmaToken: params.figmaToken,
+      nodesId: params.nodesId,
+      assetsStorage: params.assetsStorage,
+      language: settings.language,
+      model: settings.model,
+      framework: settings.framework,
+      styling: settings.styling,
+      uiLibrary: settings.uiLibrary,
+      enableTranslation: settings.enableTranslation,
+      enableUILibraryTheming: settings.enableUILibraryTheming,
+      enableCompactStructure: settings.enableCompactStructure,
+      enableAutoSplit: settings.enableAutoSplit,
+      autoSplitThreshold: settings.autoSplitThreshold,
+      disableMarkedForExport: settings.disableMarkedForExport,
+    };
+
+    return this.#processGenerationRequest<SSECodgenMessage>(
+      '/v1/codegen',
+      requestBody,
+      handler,
+      'codegen'
+    );
+  }
+
+  /**
+   * @experimental
+   * This API is experimental and may change or be removed in future releases.
+   * Link2Code (l2c) flow.
+   */
+  async generateLink2Code(params: GetLink2CodeParams, handler: GetLink2CodeHandler = {}) {
+    let tracking = params.tracking;
+    if (this.#auth && "userId" in this.#auth && this.#auth.userId) {
+      if (!tracking?.externalId) {
+        tracking = { externalId: this.#auth.userId };
+      }
+    }
+
+    const requestBody = {
+      tracking,
+      assetsStorage: params.assetsStorage,
+      params: params.params,
+    };
+
+    return this.#processGenerationRequest<SSEL2CMessage>(
+      '/v1/l2c',
+      requestBody,
+      handler,
+      'l2c'
+    );
   }
 }
