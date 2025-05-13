@@ -42,6 +42,25 @@ Check [`example-server`](/example-server) to see a thin example on how to expose
 
 Check if a given Figma link is a valid design for code generation.
 
+### Settings Options
+
+The following options can be passed to the `settings` parameter when calling `generateCode`:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `language` | `"typescript"` \| `"javascript"` | The programming language to use for code generation. |
+| `model` | `string` | The AI model to use for code generation (e.g., "gpt-4o-mini"). |
+| `framework` | `"react"` \| `"html"` | The framework to use for code generation. |
+| `styling` | `"plain_css"` \| `"css_modules"` \| `"styled_components"` \| `"tailwind"` \| `"sass"` \| `"scss"` \| `"inline_styles"` | The styling approach to use for the generated code. |
+| `uiLibrary` | `"mui"` \| `"antd"` \| `"radix"` \| `"shadcn"` | The UI component library to use (React only). |
+| `enableTranslation` | `boolean` | Enable translation support (HTML only). |
+| `enableUILibraryTheming` | `boolean` | Enable theming for the selected UI library (React only). |
+| `enableCompactStructure` | `boolean` | Generate a more compact file structure. |
+| `enableAutoSplit` | `boolean` | Automatically split components based on complexity. |
+| `autoSplitThreshold` | `number` | The complexity threshold for auto-splitting components. |
+| `disableMarkedForExport` | `boolean` | Disable the "marked for export" feature. |
+| `enableGeneratePackageLock` | `boolean` | Generate package-lock.json file. |
+
 ## Anima SDK for React
 
 We offer an official React package: `@animaapp/anima-sdk-react`.
