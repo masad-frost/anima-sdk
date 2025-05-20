@@ -20,6 +20,14 @@ const CodegenSettingsSchema = z
           "inline_styles",
         ]),
         uiLibrary: z.enum(["mui", "antd", "radix", "shadcn"]).optional(),
+        responsivePages: z
+          .array(
+            z.object({
+              name: z.string(),
+              framesId: z.array(z.string()),
+            })
+          )
+          .optional(),
         enableUILibraryTheming: z.boolean().optional(),
         enableCompactStructure: z.boolean().optional(),
         enableDisplayScreenModelId: z.boolean().optional(),
@@ -49,6 +57,10 @@ export type CodegenSettings = {
     | "scss"
     | "inline_styles";
   uiLibrary?: "mui" | "antd" | "radix" | "shadcn";
+  responsivePages?: Array<{
+    name: string;
+    framesId: string[];
+  }>;
   enableTranslation?: boolean;
   enableUILibraryTheming?: boolean;
   enableCompactStructure?: boolean;

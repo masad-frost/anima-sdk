@@ -13,6 +13,7 @@ export type CodegenErrorReason =
   | "Figma file not found"
   | "Figma rate limit exceeded"
   | "Figma selection too large"
+  | "Invalid responsive page node type"
   | "Unknown";
 
 /**
