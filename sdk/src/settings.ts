@@ -37,7 +37,7 @@ const CodegenSettingsSchema = z
       }),
       z.object({
         framework: z.literal("html"),
-        styling: z.enum(["plain_css", "inline_styles"]),
+        styling: z.enum(["plain_css", "inline_styles", "tailwind"]),
         enableTranslation: z.boolean().optional(),
       }),
     ])
