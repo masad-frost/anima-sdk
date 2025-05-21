@@ -26,6 +26,7 @@ export type CodegenRouteErrorReason =
   | "Internal server error"
   | "Forbidden, no team access"
   | "Requested Usage Exceeds Limit"
+  | "Too many responsive pages"
   | "Invalid Anima token";
 
 /**
