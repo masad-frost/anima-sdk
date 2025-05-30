@@ -67,7 +67,8 @@ export class Anima {
     nodesId: string[],
     options: {
       allowAutoSelectFirstNode: boolean;
-    }
+    },
+    signal?: AbortSignal,
   ) {
     let design: GetFileResponse;
     try {
@@ -77,18 +78,24 @@ export class Anima {
         params: {
           geometry: "paths",
         },
+        signal,
       });
-    } catch {
+    } catch (error) {
+      if (error instanceof Error && error.name === "AbortError") {
+        // The caller aborted the request, no need to fall through
+        throw error;
+      }
+
       // ignore all errors when trying to get the figma file to retry later in the backend
       return;
     }
 
     const isCompatibleResults = nodesId.map((nodeId) =>
-      isNodeCodegenCompatible(design, nodeId, options)
+      isNodeCodegenCompatible(design, nodeId, options),
     );
 
     const error = isCompatibleResults.find(
-      (isCompatible) => !isCompatible.isValid
+      (isCompatible) => !isCompatible.isValid,
     );
 
     if (error) {
@@ -317,7 +324,11 @@ export class Anima {
     });
   }
 
-  async generateCode(params: GetCodeParams, handler: GetCodeHandler = {}, signal?: AbortSignal) {
+  async generateCode(
+    params: GetCodeParams,
+    handler: GetCodeHandler = {},
+    signal?: AbortSignal,
+  ) {
     const settings = validateSettings(params.settings);
 
     if (params.figmaToken) {
@@ -325,7 +336,8 @@ export class Anima {
         params.fileKey,
         params.figmaToken,
         params.nodesId,
-        { allowAutoSelectFirstNode: settings.allowAutoSelectFirstNode ?? true }
+        { allowAutoSelectFirstNode: settings.allowAutoSelectFirstNode ?? true },
+        signal,
       );
     }
 
