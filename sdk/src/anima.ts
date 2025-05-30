@@ -112,7 +112,8 @@ export class Anima {
     endpoint: string,
     requestBody: any,
     handler: ((message: T) => void) | Record<string, any>,
-    messageType: "codegen" | "l2c"
+    messageType: "codegen" | "l2c",
+    signal?: AbortSignal,
   ): Promise<AnimaSDKResult> {
     if (this.hasAuth() === false) {
       throw new Error('It needs to set "auth" before calling this method.');
@@ -127,6 +128,7 @@ export class Anima {
         Accept: "text/event-stream",
       },
       body: JSON.stringify(requestBody),
+      signal,
     });
 
     if (!response.ok) {
@@ -315,7 +317,7 @@ export class Anima {
     });
   }
 
-  async generateCode(params: GetCodeParams, handler: GetCodeHandler = {}) {
+  async generateCode(params: GetCodeParams, handler: GetCodeHandler = {}, signal?: AbortSignal) {
     const settings = validateSettings(params.settings);
 
     if (params.figmaToken) {
@@ -360,7 +362,8 @@ export class Anima {
       "/v1/codegen",
       requestBody,
       handler,
-      "codegen"
+      "codegen",
+      signal,
     );
   }
 
@@ -371,7 +374,8 @@ export class Anima {
    */
   async generateLink2Code(
     params: GetLink2CodeParams,
-    handler: GetLink2CodeHandler = {}
+    handler: GetLink2CodeHandler = {},
+    signal?: AbortSignal,
   ) {
     let tracking = params.tracking;
     if (this.#auth && "userId" in this.#auth && this.#auth.userId) {
@@ -390,7 +394,8 @@ export class Anima {
       "/v1/l2c",
       requestBody,
       handler,
-      "l2c"
+      "l2c",
+      signal,
     );
   }
 }
