@@ -15,6 +15,7 @@ export type GetFilePagesParams = {
   authToken?: string;
   figmaRestApi?: FigmaRestApi;
   params?: Record<string, string | number | undefined>;
+  signal?: AbortSignal;
 };
 export type GetFilePagesResult = FigmaPage[] | undefined;
 export type GetFileNodesParams = {
@@ -23,6 +24,7 @@ export type GetFileNodesParams = {
   nodeIds: string[];
   figmaRestApi?: FigmaRestApi;
   params?: Record<string, string | number>;
+  signal?: AbortSignal;
 };
 
 export const getFigmaFile = async ({
@@ -30,19 +32,28 @@ export const getFigmaFile = async ({
   authToken,
   figmaRestApi = new FigmaRestApi(),
   params = {},
+  signal,
 }: GetFilePagesParams): Promise<GetFileResponse> => {
   if (authToken) {
     figmaRestApi.token = authToken;
   }
 
   try {
-    const rootFile = await figmaRestApi.files.get({
-      fileKey,
-      params,
-    });
+    const rootFile = await figmaRestApi
+      .withOptions({
+        abortSignal: signal,
+      })
+      .files.get({
+        fileKey,
+        params,
+      });
 
     return rootFile;
   } catch (error) {
+    if (error instanceof Error && error.name === "AbortError") {
+      throw error;
+    }
+
     console.error(error);
     throw wrapFigmaApiError(error as FigmaApiError, fileKey);
   }
@@ -54,29 +65,38 @@ export const getFileNodes = async ({
   nodeIds,
   figmaRestApi = new FigmaRestApi(),
   params = {},
+  signal,
 }: GetFileNodesParams) => {
   if (authToken) {
     figmaRestApi.token = authToken;
   }
 
   try {
-    const data = await figmaRestApi.nodes.get({
-      fileKey,
-      nodeIds,
-      params: {
-        ...params,
-      },
-    });
+    const data = await figmaRestApi
+      .withOptions({
+        abortSignal: signal,
+      })
+      .nodes.get({
+        fileKey,
+        nodeIds,
+        params: {
+          ...params,
+        },
+      });
 
     return data.nodes;
   } catch (error) {
+    if (error instanceof Error && error.name === "AbortError") {
+      throw error;
+    }
+
     throw wrapFigmaApiError(error as FigmaApiError, fileKey);
   }
 };
 
 export const findChildrenNode = (
   node: FigmaNode,
-  targetNodeId: string
+  targetNodeId: string,
 ): FigmaNode | null => {
   if (node.id === targetNodeId) {
     return node;
