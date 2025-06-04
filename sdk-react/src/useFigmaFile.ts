@@ -17,7 +17,7 @@ export const useFigmaFile = ({
   const isEnabled = Boolean(enabled && fileKey && authToken);
 
   const { data, isLoading, error } = useSWR(
-    ["figma", fileKey, authToken, params],
+    ["useFigmaFile", fileKey, authToken, params],
     () => {
       if (!isEnabled) {
         return null;
