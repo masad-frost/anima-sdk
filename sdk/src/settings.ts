@@ -35,6 +35,7 @@ const CodegenSettingsSchema = z
         enableGeneratePackageLock: z.boolean().optional(),
         enableAutoSplit: z.boolean().optional(),
         autoSplitThreshold: z.number().optional(),
+        codegenSettings: z.record(z.unknown()).optional(),
       }),
       z.object({
         framework: z.literal("html"),
@@ -71,6 +72,7 @@ export type CodegenSettings = {
   allowAutoSelectFirstNode?: boolean;
   enableDisplayScreenModelId?: boolean;
   enableGeneratePackageLock?: boolean;
+  codegenSettings?: Record<string, unknown>;
 };
 
 export const validateSettings = (obj: unknown): CodegenSettings => {

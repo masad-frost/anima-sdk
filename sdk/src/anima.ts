@@ -368,6 +368,7 @@ export class Anima {
       allowAutoSelectFirstNode: settings.allowAutoSelectFirstNode,
       enableDisplayScreenModelId: settings.enableDisplayScreenModelId,
       enableGeneratePackageLock: settings.enableGeneratePackageLock,
+      codegenSettings: settings.codegenSettings,
     };
 
     return this.#processGenerationRequest<SSECodgenMessage>(
