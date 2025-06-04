@@ -37,7 +37,7 @@ export const formatToFigmaLink = ({
   duplicate,
 }: {
   fileKey: string;
-  nodeId: string;
+  nodeId?: string;
   duplicate?: boolean;
 }) => {
   const url = new URL("https://www.figma.com");
