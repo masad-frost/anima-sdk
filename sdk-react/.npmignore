@@ -1,6 +1,0 @@
-.env
-src
-tests
-.turbo
-.storybook
-vite.config.ts

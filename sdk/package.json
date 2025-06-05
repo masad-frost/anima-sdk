@@ -1,11 +1,10 @@
 {
-  "name": "@animaapp/anima-sdk",
-  "version": "0.5.0",
+  "name": "@replit/anima-sdk",
+  "version": "0.7.0",
   "type": "module",
   "description": "Anima's JavaScript utilities library",
   "author": "Anima App, Inc.",
   "license": "ISC",
-  "packageManager": "yarn@4.6.0",
   "exports": {
     "import": "./dist/index.js",
     "require": "./dist/index.cjs"
@@ -13,7 +12,7 @@
   "types": "./dist/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/AnimaApp/anima-sdk.git"
+    "url": "git+https://github.com/masfrost/anima-sdk.git"
   },
   "publishConfig": {
     "access": "public"
@@ -22,7 +21,7 @@
     "build": "vite build",
     "dev": "vite build --watch",
     "test": "vitest --watch=false",
-    "prepack": "yarn build",
+    "prepack": "npm run build",
     "update-design-test-snapshot": "tsx tests/design/update.ts"
   },
   "dependencies": {
