@@ -157,9 +157,10 @@ export class Anima {
 
       if (typeof errorObj === "object") {
         throw new CodegenError({
-          name: `Error "${errorObj}"`,
+          name: "Unknown error",
           reason: "Unknown",
           status: response.status,
+          detail: errorObj,
         });
       }
 
