@@ -43,5 +43,11 @@
     "eslint-plugin-unused-imports": "^3.0.0",
     "turbo": "^2.4.4",
     "typescript": "^5.7.3"
+  },
+  "prettier": {
+    "singleQuote": false,
+    "plugins": [
+      "@trivago/prettier-plugin-sort-imports"
+    ]
   }
 }

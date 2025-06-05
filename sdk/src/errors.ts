@@ -45,19 +45,18 @@ export class CodegenError extends Error {
   detail?: unknown;
 
   constructor({
-    name,
-    reason,
+    code,
+    message,
     status,
     detail,
   }: {
-    name: string;
-    reason: CodegenErrorReason | CodegenRouteErrorReason | SDKErrorReason;
+    code: string;
+    message: CodegenErrorReason | CodegenRouteErrorReason | SDKErrorReason;
     status?: number;
     detail?: unknown;
   }) {
-    super();
-    this.name = name;
-    this.message = reason;
+    super(message);
+    this.name = code;
     this.detail = detail;
     this.status = status;
   }

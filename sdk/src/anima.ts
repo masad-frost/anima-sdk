@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { GetFileResponse } from "@figma/rest-api-spec";
 import { CodegenError, CodegenRouteErrorReason } from "./errors";
 import { getFigmaFile } from "./figma";
 import { validateSettings } from "./settings";
@@ -13,6 +12,7 @@ import {
   SSEL2CMessage,
 } from "./types";
 import { isNodeCodegenCompatible } from "./utils/isNodeCodegenCompatible";
+import { GetFileResponse } from "@figma/rest-api-spec";
 
 export type Auth =
   | { token: string; teamId: string } // for Anima user, it's mandatory to have an associated team
@@ -100,8 +100,8 @@ export class Anima {
 
     if (error) {
       throw new CodegenError({
-        name: "Task Crashed",
-        reason: error.reason,
+        code: "Task Crashed",
+        message: error.reason,
       });
     }
   }
@@ -148,8 +148,8 @@ export class Anima {
 
       if (errorObj?.error?.name === "ZodError") {
         throw new CodegenError({
-          name: "HTTP error from Anima API",
-          reason: "Invalid body payload",
+          code: "HTTP error from Anima API",
+          message: "Invalid body payload",
           detail: errorObj.error.issues,
           status: response.status,
         });
@@ -157,24 +157,24 @@ export class Anima {
 
       if (typeof errorObj === "object") {
         throw new CodegenError({
-          name: "Unknown error",
-          reason: "Unknown",
+          code: "Unknown error",
+          message: "Unknown",
           status: response.status,
           detail: errorObj,
         });
       }
 
       throw new CodegenError({
-        name: "HTTP error from Anima API",
-        reason: errorText as CodegenRouteErrorReason,
+        code: "HTTP error from Anima API",
+        message: errorText as CodegenRouteErrorReason,
         status: response.status,
       });
     }
 
     if (!response.body) {
       throw new CodegenError({
-        name: "Stream Error",
-        reason: "Response body is null",
+        code: "Stream Error",
+        message: "Response body is null",
         status: response.status,
       });
     }
@@ -294,16 +294,16 @@ export class Anima {
 
               case "error": {
                 throw new CodegenError({
-                  name: (data as any).payload.errorName,
-                  reason: (data as any).payload.reason,
+                  code: (data as any).payload.errorName,
+                  message: (data as any).payload.reason,
                 });
               }
 
               case "done": {
                 if (!result.files) {
                   throw new CodegenError({
-                    name: "Invalid response",
-                    reason: "No code generated",
+                    code: "Invalid response",
+                    message: "No code generated",
                   });
                 }
 
@@ -319,8 +319,8 @@ export class Anima {
     }
 
     throw new CodegenError({
-      name: "Connection",
-      reason: "Connection closed before the 'done' message",
+      code: "Connection",
+      message: "Connection closed before the 'done' message",
       status: 500,
     });
   }
